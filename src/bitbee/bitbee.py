@@ -17,7 +17,7 @@ class BitBeeClient(object):
         self.callback_url = callback_url
         self.endpoint = endpoint
 
-    def place_order(self, mobile: str, amount: str, client_order_id: str) -> model.PlaceOrderResponse:
+    def place_order(self, mobile: str, amount: str, client_order_id: str, callback_url: str = '') -> model.PlaceOrderResponse:
         nonce = self.nonce
         timestamp = str(int(time.time()))
         body = {
@@ -31,6 +31,9 @@ class BitBeeClient(object):
         signature = self.generate_signature(body)
         body['corp_id'] = self.corp_id
         body['signature'] = signature
+        if callback_url:
+            body['callback_url'] = callback_url
+
         data = self.__do_request('charge_std', body)
         return model.PlaceOrderResponse(
             status=data.get('status', ''),
